@@ -8,10 +8,42 @@ export const authRegisterController = async (
   res: express.Response,
 ) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, recaptcha_token, recaptcha_setting_key } = req.body;
 
     if (!email || !password) {
       return res.processResponse(400, "Campos da requisição inválidos");
+    }
+
+
+    if(recaptcha_setting_key) {
+      const db_secret_setting = await prisma.setting.findFirst({
+        where: {
+          option: recaptcha_setting_key
+        }
+      })
+
+      
+      if(!db_secret_setting) {
+        return res.processResponse(201, 'ReCaptcha não configurado')
+      }
+
+      const response = await fetch(
+        `https://hcaptcha.com/siteverify`,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+          },
+          body: `response=${recaptcha_token}&secret=${db_secret_setting.valOption}`,
+          method: "POST",
+        }
+      );
+      const captchaValidation = await response.json() as any;
+
+
+      if (!captchaValidation.success) {
+        return res.processResponse(400, 'ReCaptcha Inválido ou Expirado')
+      }
+  
     }
 
     const findU = await prisma.users.findFirst({ where: { email } });
@@ -43,17 +75,48 @@ export const authRegisterController = async (
   }
 };
 
+
 export const authLoginController = async (
   req: express.Request,
   res: express.Response,
 ) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, recaptcha_token, recaptcha_setting_key} = req.body;
 
     if (!email || !password) {
       return res.processResponse(400, "Campos da requisição inválidos");
     }
 
+    if(recaptcha_setting_key) {
+      const db_secret_setting = await prisma.setting.findFirst({
+        where: {
+          option: recaptcha_setting_key
+        }
+      })
+
+      
+      if(!db_secret_setting) {
+        return res.processResponse(201, 'ReCaptcha não configurado')
+      }
+
+      const response = await fetch(
+        `https://hcaptcha.com/siteverify`,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+          },
+          body: `response=${recaptcha_token}&secret=${db_secret_setting.valOption}`,
+          method: "POST",
+        }
+      );
+      const captchaValidation = await response.json() as any;
+
+
+      if (!captchaValidation.success) {
+        return res.processResponse(400, 'ReCaptcha Inválido ou Expirado')
+      }
+  
+    }
     const findU = await prisma.users.findFirst({ where: { email } });
 
     if (!findU) {

@@ -34,11 +34,11 @@ model Group {
   description String?
   slug        String  @unique @default("")
   link        String  @unique
-  bannerImage String  @default("")
+  bannerImage String  @default("") 
   stApproved  Boolean @default(false)
   type        String  @default("group")
   categoryId  Int?
-
+  group_image String?
   impulse          Boolean  @default(false)
   impulse_end_date DateTime @default(now())
 
@@ -71,6 +71,7 @@ model Setting {
   id        Int    @id @default(autoincrement())
   option    String @unique
   valOption String
+  isConfidential Boolean @default(false)
 
   @@map("tb_settings")
 }

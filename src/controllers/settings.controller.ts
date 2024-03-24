@@ -36,6 +36,7 @@ export const settingsPatchController = async (
   }
 };
 
+
 export const settingsFetchAllController = async (
   req: express.Request,
   res: express.Response,
@@ -49,11 +50,12 @@ export const settingsFetchAllController = async (
         "Não foi possível listar as configurações",
       );
     }
-
     let settings = {};
 
     for (const setting of findSettings) {
-      settings = { ...settings, [setting.option]: setting.valOption };
+      if(!setting.isConfidential) {
+        settings = { ...settings, [setting.option]: setting.valOption };
+      }
     }
 
     return res.processResponse(
