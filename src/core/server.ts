@@ -16,6 +16,9 @@ dotenv.config();
 const app: Application = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.urlencoded({
+  extended: true
+}))
 // @ts-ignore
 app.use(processResponseMiddleware);
 

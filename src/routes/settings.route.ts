@@ -14,8 +14,8 @@ import { cacheCore } from "../core/cache.ts";
 const routerInstance = express.Router();
 
 routerInstance.get("/list/all",cacheCore.cache.middleware(180, 'list-all-settings'),settingsFetchAllController);
-routerInstance.patch(
-  "/patch",
+routerInstance.post(
+  "/post",
   [isAuthenticatedMiddleware, isAdminMiddleware],
   settingsPatchController,
 );
