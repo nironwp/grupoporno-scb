@@ -7,7 +7,7 @@ export const settingsPatchController = async (
 ) => {
   try {
     const { option, valOption } = req.body;
-
+    console.log(option, valOption)
     const setting = await prisma.setting.upsert({
       where: {
         option,
