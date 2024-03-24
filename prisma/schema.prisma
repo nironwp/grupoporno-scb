@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+
+model Users {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  role          Int      @default(1)
+  password      String
+  dt_created_at DateTime @default(now())
+
+  @@map("tb_users")
+}
+
+model Category {
+  id            Int      @id @default(autoincrement())
+  title         String
+  slug          String   @unique
+  banner_image  String
+  dt_created_at DateTime @default(now())
+
+  @@map("tb_categories")
+}
+
+model Group {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  slug        String  @unique @default("")
+  link        String  @unique
+  bannerImage String  @default("")
+  stApproved  Boolean @default(false)
+  type        String  @default("group")
+  categoryId  Int?
+
+  impulse          Boolean  @default(false)
+  impulse_end_date DateTime @default(now())
+
+  userIdApproved Int?
+  userIdCreated  Int
+  Payment        Payment[]
+
+  @@map("tb_groups")
+}
+
+model Payment {
+  id      Int   @id @default(autoincrement())
+  plan    Plan  @relation(fields: [planId], references: [id])
+  groups   Group @relation(fields: [groupId], references: [id])
+  planId  Int
+  groupId Int
+}
+
+model Plan {
+  id      Int       @id @default(autoincrement())
+  name    String
+  time    Int
+  value   Float
+  payments Payment[]
+
+  @@map("tb_plans")
+}
+
+model Setting {
+  id        Int    @id @default(autoincrement())
+  option    String @unique
+  valOption String
+
+  @@map("tb_settings")
+}
